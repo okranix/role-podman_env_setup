@@ -1,2 +1,4 @@
 ---
 # defaults file for role-podman_env_setup
+
+podman_user: ansible
