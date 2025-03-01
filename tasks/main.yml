@@ -9,7 +9,7 @@
   become: true
   become_user: root
 
-- name: Ensure {{ podman_user }} user exists
+- name: Ensure podman user exists
   ansible.builtin.user:
     name: "{{ podman_user }}"
     comment: "Podman user"
@@ -19,7 +19,7 @@
   become: true
   become_user: root
 
-- name: Get home directory of {{ podman_user }} user
+- name: Get home directory of podman user
   ansible.builtin.getent:
     database: passwd
     key: "{{ podman_user }}"
@@ -30,11 +30,11 @@
     podman_user_home: "{{ getent_passwd[podman_user][4] }}"
   ignore_errors: "{{ ansible_check_mode }}"
 
-- name: Ensure {{ podman_user }} registry config directory
+- name: Ensure podman user registry config directory
   ansible.builtin.file:
     path: "{{ podman_user_home }}/.config/containers"
     state: directory
-    mode: "0750" 
+    mode: "0750"
   ignore_errors: "{{ ansible_check_mode }}"
   become: true
   become_user: root
@@ -60,7 +60,11 @@
 
 - name: Enable containers to run after logout
   ansible.builtin.command:
-    "loginctl enable-linger {{ podman_user }}"
+    - /usr/bin/loginctl
+    - enable-linger
+    - "{{ podman_user }}"
+  creates: "/var/lib/systemd/linger/{{ podman_user }}"
+
   ignore_errors: "{{ ansible_check_mode }}"
   become: true
   become_user: root
