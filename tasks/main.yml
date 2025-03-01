@@ -1,2 +1,7 @@
 ---
 # tasks file for role-podman_env_setup
+- name: Ensure podman is installedd
+  ansible.builtin.apt:
+    name:
+      - podman
+    state: present
