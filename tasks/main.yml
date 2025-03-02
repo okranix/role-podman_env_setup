@@ -37,7 +37,7 @@
     mode: "0750"
   ignore_errors: "{{ ansible_check_mode }}"
   become: true
-  become_user: root
+  become_user: "{{ podman_user }}"
 
 - name: Setup registries config file
   ansible.builtin.copy:
@@ -54,15 +54,15 @@
   ansible.builtin.lineinfile:
     dest: "{{ podman_user_home }}/.config/containers/registries.conf"
     line: 'unqualified-search-registries = ["docker.io"]'
+    owner: "{{ podman_user }}"
+    group: "{{ podman_user }}"
+    mode: "0750"
   ignore_errors: "{{ ansible_check_mode }}"
   become: true
   become_user: root
 
 - name: Enable containers to run after logout
-  ansible.builtin.command:
-    - /usr/bin/loginctl
-    - enable-linger
-    - "{{ podman_user }}"
+  ansible.builtin.command: /usr/bin/loginctl enable-linger {{ podman_user }}
   creates: "/var/lib/systemd/linger/{{ podman_user }}"
   ignore_errors: "{{ ansible_check_mode }}"
   become: true
