@@ -57,13 +57,27 @@
     owner: "{{ podman_user }}"
     group: "{{ podman_user }}"
     mode: "0750"
+    state: present
+  ignore_errors: "{{ ansible_check_mode }}"
+  become: true
+  become_user: root
+
+- name: Set default storage location
+  ansible.builtin.lineinfile:
+    dest: "{{ podman_user_home }}/.config/containers/containers.conf"
+    line: "volume_path={{ podman_user_home }}/nextcloud_container_data"
+    owner: "{{ podman_user }}"
+    group: "{{ podman_user }}"
+    mode: "0750"
+    create: true
   ignore_errors: "{{ ansible_check_mode }}"
   become: true
   become_user: root
 
 - name: Enable containers to run after logout
-  ansible.builtin.command: /usr/bin/loginctl enable-linger {{ podman_user }}
-  creates: "/var/lib/systemd/linger/{{ podman_user }}"
+  ansible.builtin.command:
+    "/usr/bin/loginctl enable-linger {{ podman_user }}"
+  # creates: "/var/lib/systemd/linger/{{ podman_user }}"
   ignore_errors: "{{ ansible_check_mode }}"
   become: true
   become_user: root
@@ -72,7 +86,6 @@
   ansible.posix.sysctl:
     name: net.ipv4.ip_unprivileged_port_start
     value: "80"
-    state: present
     sysctl_set: true
     reload: true
     sysctl_file: "/etc/sysctl.d/podman-privileged-ports.conf"
