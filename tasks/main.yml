@@ -76,8 +76,11 @@
 
 - name: Enable containers to run after logout
   ansible.builtin.command:
-    "/usr/bin/loginctl enable-linger {{ podman_user }}"
-  # creates: "/var/lib/systemd/linger/{{ podman_user }}"
+    argv:
+      - /usr/bin/loginctl
+      - enable-linger
+      - "{{ podman_user }}"
+    creates: "/var/lib/systemd/linger/{{ podman_user }}"
   ignore_errors: "{{ ansible_check_mode }}"
   become: true
   become_user: root
