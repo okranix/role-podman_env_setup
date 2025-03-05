@@ -85,7 +85,7 @@
   become: true
   become_user: root
 
-- name: Allow podman containers use of privileged ports below 1024
+- name: Allow rootless podman containers use of privileged ports below 1024
   ansible.posix.sysctl:
     name: net.ipv4.ip_unprivileged_port_start
     value: "80"
